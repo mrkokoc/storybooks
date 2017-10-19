@@ -9,7 +9,13 @@ const User = mongoose.model('users');
 
 // Stories Index
 router.get('/', (req, res) => {
-    res.render('stories/index');
+    Story.find({status: 'public'})
+            .populate('user')
+            .then(stories => {
+                res.render('stories/index', {
+                    stories: stories
+                });
+            });
 });
 
 // Add Story Form
@@ -22,12 +28,12 @@ router.post('/', (req, res) => {
     // console.log(req.body);
     let allowComments;
 
-    // allowComments = !!req.body.allowComments;
-    if (req.body.allowComments) {
-        allowComments = true;
-    } else {
-        allowComments = false;
-    }
+    allowComments = !!req.body.allowComments;
+    // if (req.body.allowComments) {
+    //     allowComments = true;
+    // } else {
+    //     allowComments = false;
+    // }
 
     const newStory = {
         title: req.body.title,
