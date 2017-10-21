@@ -26,6 +26,7 @@ router.get('/show/:id', (req, res) => {
         _id: req.params.id
     })
             .populate('user')
+            .populate('comments.commentUser')
             .then(story => {
                 res.render('stories/show', {
                     story: story
@@ -92,6 +93,28 @@ router.put('/:id', (req, res) => {
                 story.save()
                         .then(story => {
                             res.redirect('/dashboard')
+                        });
+            });
+});
+
+// Add Comment Process
+router.post('/comment/:id', (req, res) => {
+    Story.findOne({
+        _id: req.params.id
+    })
+            .populate('user')
+            .then(story => {
+
+                const newComment = {
+                    commentBody: req.body.commentBody,
+                    commentUser: req.user.id
+                };
+
+                // add comment
+                story.comments.unshift(newComment);
+                story.save()
+                        .then(story => {
+                            res.redirect(`/stories/show/${story.id}`);
                         });
             });
 });
